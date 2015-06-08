@@ -130,7 +130,7 @@ func (d *Dokku) rebuild(appName string) error {
 }
 
 func (d *Dokku) destroy(appName string) error {
-	_, err := d.exec([]string{"apps:destroy", appName})
+	_, err := d.exec([]string{"apps:destroy", appName, "--force"})
 	return err
 }
 
