@@ -139,5 +139,11 @@ func (d *Dokku) urls(appName string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return strings.Split(str, "\n"), nil
+	result := strings.Split(str, "\n")
+	for i, url := range result {
+		if url == "" {
+			result = append(result[:i], result[i+1:]...)
+		}
+	}
+	return result, nil
 }
