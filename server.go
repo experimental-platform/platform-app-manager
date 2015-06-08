@@ -87,6 +87,15 @@ func main() {
 		}
 	})
 
+	m.Get("/logs", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		str, err := client.logs(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, str)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
 	http.Handle("/", m)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }

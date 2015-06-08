@@ -134,6 +134,11 @@ func (d *Dokku) destroy(appName string) error {
 	return err
 }
 
+func (d *Dokku) logs(appName string) (string, error) {
+	str, err := d.exec([]string{"logs", appName})
+	return str, err
+}
+
 func (d *Dokku) urls(appName string) ([]string, error) {
 	str, err := d.exec([]string{"urls", appName})
 	if err != nil {
