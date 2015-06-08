@@ -89,7 +89,7 @@ func main() {
 
 	m.Get("/logs/:name", func(args martini.Params, r render.Render) {
 		name := args["name"]
-		str, err := client.logs(d.Name)
+		str, err := client.logs(name)
 		if err == nil {
 			r.JSON(http.StatusOK, str)
 		} else {
