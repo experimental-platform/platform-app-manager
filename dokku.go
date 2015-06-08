@@ -14,10 +14,11 @@ type Dokku struct {
 }
 
 type DokkuApp struct {
-	Name          string
-	ContainerType string
-	ContainerId   string
-	State         string
+	Name          string   `form:"name" json:"name" binding:"required"`
+	ContainerType string   `form:"-" json:"container_type,omitempty"`
+	ContainerId   string   `form:"-" json:"container_id,omitempty"`
+	State         string   `form:"-" json:"state,omitempty"`
+	Urls          []string `form:"-" json:"urls,omitempty"`
 }
 
 func NewDokku() (*Dokku, error) {
@@ -96,6 +97,10 @@ func (d *Dokku) List() []DokkuApp {
 				}
 				if length > 3 {
 					dokkuApp.State = appStr[3]
+				}
+				urls, err := d.urls(dokkuApp.Name)
+				if err == nil {
+					dokkuApp.Urls = urls
 				}
 				apps = append(apps, dokkuApp)
 			}

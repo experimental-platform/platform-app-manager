@@ -3,22 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/codegangsta/martini-contrib/binding"
+	"github.com/codegangsta/martini-contrib/render"
+	"github.com/go-martini/martini"
 	"net/http"
 	"strconv"
 )
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	// imgs, _ := client.ListImages(docker.ListImagesOptions{All: false})
-	// for _, img := range imgs {
-	// 	fmt.Println("ID: ", img.ID)
-	// 	fmt.Println("RepoTags: ", img.RepoTags)
-	// 	fmt.Println("Created: ", img.Created)
-	// 	fmt.Println("Size: ", img.Size)
-	// 	fmt.Println("VirtualSize: ", img.VirtualSize)
-	// 	fmt.Println("ParentId: ", img.ParentID)
-	// }
-	fmt.Printf("%+v\n", client.List())
-}
 
 var client *Dokku
 var CONTAINER_NAME = "dokku"
@@ -36,6 +26,58 @@ func main() {
 		panic("Container '" + CONTAINER_NAME + "' is not running!")
 	}
 
-	http.HandleFunc("/", handler)
+	m := martini.Classic()
+	m.Use(render.Renderer())
+	m.Get("/list", func(r render.Render) {
+		r.JSON(http.StatusOK, client.List())
+	})
+
+	m.Post("/start", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		err := client.start(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, d)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
+	m.Post("/stop", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		err := client.stop(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, d)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
+	m.Post("/restart", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		err := client.restart(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, d)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
+	m.Post("/rebuild", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		err := client.rebuild(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, d)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
+	m.Get("/urls/:name", func(args martini.Params, r render.Render) {
+		name := args["name"]
+		urls, err := client.urls(name)
+		if err == nil {
+			r.JSON(http.StatusOK, urls)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
+	http.Handle("/", m)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
