@@ -87,7 +87,8 @@ func main() {
 		}
 	})
 
-	m.Get("/logs", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+	m.Get("/logs/:name", func(args martini.Params, r render.Render) {
+		name := args["name"]
 		str, err := client.logs(d.Name)
 		if err == nil {
 			r.JSON(http.StatusOK, str)
