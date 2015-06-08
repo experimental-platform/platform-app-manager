@@ -68,6 +68,15 @@ func main() {
 		}
 	})
 
+	m.Post("/destroy", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {
+		err := client.destroy(d.Name)
+		if err == nil {
+			r.JSON(http.StatusOK, d)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
+	})
+
 	m.Get("/urls/:name", func(args martini.Params, r render.Render) {
 		name := args["name"]
 		urls, err := client.urls(name)

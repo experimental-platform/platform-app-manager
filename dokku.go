@@ -129,6 +129,11 @@ func (d *Dokku) rebuild(appName string) error {
 	return err
 }
 
+func (d *Dokku) destroy(appName string) error {
+	_, err := d.exec([]string{"apps:destroy", appName})
+	return err
+}
+
 func (d *Dokku) urls(appName string) ([]string, error) {
 	str, err := d.exec([]string{"urls", appName})
 	if err != nil {
