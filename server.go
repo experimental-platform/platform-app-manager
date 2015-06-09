@@ -91,7 +91,11 @@ func main() {
 		name := args["name"]
 		str, err := client.logs(name)
 		if err == nil {
-			r.JSON(http.StatusOK, str)
+			r.JSON(http.StatusOK, struct {
+				Message string `json:"msg"`
+			}{
+				str,
+			})
 		} else {
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
