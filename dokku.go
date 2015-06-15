@@ -16,6 +16,7 @@ type Dokku struct {
 type DokkuApp struct {
 	Name          string   `form:"name" json:"name" binding:"required"`
 	ContainerType string   `form:"-" json:"container_type,omitempty"`
+	AppType       string   `form:"-" json:"app_type",omitempty"`
 	ContainerId   string   `form:"-" json:"container_id,omitempty"`
 	State         string   `form:"-" json:"state,omitempty"`
 	Urls          []string `form:"-" json:"urls,omitempty"`
@@ -76,7 +77,7 @@ func (d *Dokku) exec(cmd []string) (string, error) {
 }
 
 func (d *Dokku) List() []DokkuApp {
-	str, err := d.exec([]string{"ls"})
+	str, err := d.exec([]string{"protonet:ls"})
 	var apps []DokkuApp
 	if err == nil {
 		for _, line := range strings.Split(str, "\n")[1:] {
@@ -93,10 +94,13 @@ func (d *Dokku) List() []DokkuApp {
 					dokkuApp.ContainerType = appStr[1]
 				}
 				if length > 2 {
-					dokkuApp.ContainerId = appStr[2]
+					dokkuApp.AppType = appStr[2]
 				}
 				if length > 3 {
-					dokkuApp.State = appStr[3]
+					dokkuApp.ContainerId = appStr[3]
+				}
+				if length > 4 {
+					dokkuApp.State = appStr[4]
 				}
 				urls, err := d.urls(dokkuApp.Name)
 				if err == nil {
