@@ -23,7 +23,7 @@ func main() {
 	client, err = NewDokku()
 
 	if err != nil {
-		panic("Container '" + CONTAINER_NAME + "' is not running!")
+		panic(err)
 	}
 
 	m := martini.Classic()

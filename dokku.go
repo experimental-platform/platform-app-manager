@@ -9,8 +9,7 @@ import (
 )
 
 type Dokku struct {
-	Client    *docker.Client
-	Container *docker.Container
+	Client *docker.Client
 }
 
 type DokkuApp struct {
@@ -29,20 +28,14 @@ func NewDokku() (*Dokku, error) {
 		return nil, err
 	}
 
-	container, err := client.InspectContainer("dokku")
-	if err != nil {
-		return nil, err
-	}
-
 	return &Dokku{
-		Client:    client,
-		Container: container,
+		Client: client,
 	}, nil
 }
 
 func (d *Dokku) raw_exec(cmd []string) (string, error) {
 	exec, err := d.Client.CreateExec(docker.CreateExecOptions{
-		Container:    d.Container.ID,
+		Container:    "dokku",
 		Cmd:          cmd,
 		AttachStdout: true,
 		AttachStderr: true,
