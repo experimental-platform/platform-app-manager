@@ -71,9 +71,9 @@ func (d *Dokku) exec(cmd []string) (string, error) {
 
 func (d *Dokku) List() []DokkuApp {
 	str, err := d.exec([]string{"protonet:ls"})
-	var apps []DokkuApp
+	apps := make([]DokkuApp, 0)
 	if err == nil {
-		for _, line := range strings.Split(str, "\n")[1:] {
+		for _, line := range strings.Split(str, "\n") {
 			var appStr []string
 			for _, col := range strings.Split(line, " ") {
 				if col != "" {
