@@ -1,4 +1,4 @@
-FROM dockerregistry.protorz.net/ubuntu:latest
+FROM experimentalplatform/ubuntu:latest
 
 COPY app-manager /app-manager
 
