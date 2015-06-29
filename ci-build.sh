@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 SRC_PATH=$(pwd)
