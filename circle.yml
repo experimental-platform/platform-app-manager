@@ -18,7 +18,7 @@ deployment:
     commands:
       - echo -e "\n\nWe're not uploading master anywhere."
   deploy:
-    branch: *
+    branch: /*/
     commands:
       - docker login -e ${DOCKER_EMAIL} -u ${DOCKER_USER} -p ${DOCKER_PASS}
       - docker push experimentalplatform/app-manager:${CIRCLE_BRANCH}
