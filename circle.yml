@@ -8,7 +8,7 @@ dependencies:
 
 test:
   override:
-    - echo "TODO: Insert some tests here?"
+    - "echo 'TODO: Insert some tests here?'"
 #    - docker run -d -p 9200:9200 circleci/elasticsearch; sleep 10
 #    - curl --retry 10 --retry-delay 5 -v http://localhost:9200
 
