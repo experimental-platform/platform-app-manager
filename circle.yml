@@ -30,6 +30,6 @@ deployment:
       - docker push experimentalplatform/app-manager:$CIRCLE_BRANCH
       - >
         curl --header "Content-Type: application/json"
-             --data '{"build_parameters": {"SERVICE_TAG": "$CIRCLE_BRANCH"}, "SERVICE_NAME": "app-manager"}'
-             --request POST
+        --data '{"build_parameters": {"SERVICE_TAG": "$CIRCLE_BRANCH"}, "SERVICE_NAME": "app-manager"}'
+        --request POST
         https://circleci.com/api/v1/project/experimental-platform/platform-configure/tree/development?circle-token=$CIRCLE_TOKEN
