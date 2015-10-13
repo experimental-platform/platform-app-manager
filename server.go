@@ -29,7 +29,12 @@ func main() {
 	m := martini.Classic()
 	m.Use(render.Renderer())
 	m.Get("/list", func(r render.Render) {
-		r.JSON(http.StatusOK, client.List())
+		apps, err := client.List()
+		if err == nil {
+			r.JSON(http.StatusOK, apps)
+		} else {
+			r.JSON(http.StatusInternalServerError, err.Error())
+		}
 	})
 
 	m.Post("/start", binding.Bind(DokkuApp{}), func(d DokkuApp, r render.Render) {

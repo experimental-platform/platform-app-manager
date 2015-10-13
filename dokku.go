@@ -69,41 +69,43 @@ func (d *Dokku) exec(cmd []string) (string, error) {
 	return d.raw_exec(full_cmd)
 }
 
-func (d *Dokku) List() []DokkuApp {
+func (d *Dokku) List() (apps []DokkuApp, err error) {
 	str, err := d.exec([]string{"protonet:ls"})
-	apps := make([]DokkuApp, 0)
-	if err == nil {
-		for _, line := range strings.Split(str, "\n") {
-			var appStr []string
-			for _, col := range strings.Split(line, " ") {
-				if col != "" {
-					appStr = append(appStr, col)
-				}
-			}
-			if length := len(appStr); length > 0 {
-				var dokkuApp DokkuApp
-				dokkuApp.Name = appStr[0]
-				if length > 1 {
-					dokkuApp.ContainerType = appStr[1]
-				}
-				if length > 2 {
-					dokkuApp.AppType = appStr[2]
-				}
-				if length > 3 {
-					dokkuApp.ContainerId = appStr[3]
-				}
-				if length > 4 {
-					dokkuApp.State = appStr[4]
-				}
-				urls, err := d.urls(dokkuApp.Name)
-				if err == nil {
-					dokkuApp.Urls = urls
-				}
-				apps = append(apps, dokkuApp)
+	if err != nil {
+		return
+	}
+
+	for _, line := range strings.Split(str, "\n") {
+		var appStr []string
+		for _, col := range strings.Split(line, " ") {
+			if col != "" {
+				appStr = append(appStr, col)
 			}
 		}
+		if length := len(appStr); length > 0 {
+			var dokkuApp DokkuApp
+			dokkuApp.Name = appStr[0]
+			if length > 1 {
+				dokkuApp.ContainerType = appStr[1]
+			}
+			if length > 2 {
+				dokkuApp.AppType = appStr[2]
+			}
+			if length > 3 {
+				dokkuApp.ContainerId = appStr[3]
+			}
+			if length > 4 {
+				dokkuApp.State = appStr[4]
+			}
+			urls, err := d.urls(dokkuApp.Name)
+			if err == nil {
+				dokkuApp.Urls = urls
+			}
+			apps = append(apps, dokkuApp)
+		}
 	}
-	return apps
+
+	return
 }
 
 func (d *Dokku) start(appName string) error {
