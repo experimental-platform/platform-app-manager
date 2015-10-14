@@ -115,6 +115,11 @@ func (d *Dokku) start(appName string) error {
 
 func (d *Dokku) stop(appName string) error {
 	_, err := d.exec([]string{"ps:stop", appName})
+	if err != nil {
+		return err
+	}
+
+	_, err = d.exec([]string{"cleanup"})
 	return err
 }
 
