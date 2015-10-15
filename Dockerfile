@@ -1,6 +1,6 @@
 FROM experimentalplatform/ubuntu:latest
 
-COPY app-manager /app-manager
+COPY platform-app-manager /app-manager
 
 CMD ["/app-manager", "--port", "80"]
 

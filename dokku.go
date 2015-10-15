@@ -69,41 +69,43 @@ func (d *Dokku) exec(cmd []string) (string, error) {
 	return d.raw_exec(full_cmd)
 }
 
-func (d *Dokku) List() []DokkuApp {
+func (d *Dokku) List() (apps []DokkuApp, err error) {
 	str, err := d.exec([]string{"protonet:ls"})
-	apps := make([]DokkuApp, 0)
-	if err == nil {
-		for _, line := range strings.Split(str, "\n") {
-			var appStr []string
-			for _, col := range strings.Split(line, " ") {
-				if col != "" {
-					appStr = append(appStr, col)
-				}
-			}
-			if length := len(appStr); length > 0 {
-				var dokkuApp DokkuApp
-				dokkuApp.Name = appStr[0]
-				if length > 1 {
-					dokkuApp.ContainerType = appStr[1]
-				}
-				if length > 2 {
-					dokkuApp.AppType = appStr[2]
-				}
-				if length > 3 {
-					dokkuApp.ContainerId = appStr[3]
-				}
-				if length > 4 {
-					dokkuApp.State = appStr[4]
-				}
-				urls, err := d.urls(dokkuApp.Name)
-				if err == nil {
-					dokkuApp.Urls = urls
-				}
-				apps = append(apps, dokkuApp)
+	if err != nil {
+		return
+	}
+
+	for _, line := range strings.Split(str, "\n") {
+		var appStr []string
+		for _, col := range strings.Split(line, " ") {
+			if col != "" {
+				appStr = append(appStr, col)
 			}
 		}
+		if length := len(appStr); length > 0 {
+			var dokkuApp DokkuApp
+			dokkuApp.Name = appStr[0]
+			if length > 1 {
+				dokkuApp.ContainerType = appStr[1]
+			}
+			if length > 2 {
+				dokkuApp.AppType = appStr[2]
+			}
+			if length > 3 {
+				dokkuApp.ContainerId = appStr[3]
+			}
+			if length > 4 {
+				dokkuApp.State = appStr[4]
+			}
+			urls, err := d.urls(dokkuApp.Name)
+			if err == nil {
+				dokkuApp.Urls = urls
+			}
+			apps = append(apps, dokkuApp)
+		}
 	}
-	return apps
+
+	return
 }
 
 func (d *Dokku) start(appName string) error {
@@ -113,7 +115,16 @@ func (d *Dokku) start(appName string) error {
 
 func (d *Dokku) stop(appName string) error {
 	_, err := d.exec([]string{"ps:stop", appName})
-	return err
+	if err != nil {
+		return err
+	}
+
+	_, err = d.exec([]string{"cleanup"})
+	if err != nil {
+		return err
+	}
+
+	return d.cleanupDeadContainers()
 }
 
 func (d *Dokku) restart(appName string) error {
@@ -148,4 +159,24 @@ func (d *Dokku) urls(appName string) ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+// cleanupDeadContainers removes any container with the "Dead" status returned by API.
+// Such containers are commonly left behind by 'dokku cleanup'
+func (d *Dokku) cleanupDeadContainers() error {
+	listOpts := docker.ListContainersOptions{All: true, Filters: map[string][]string{"status": {"dead"}}}
+	list, err := d.Client.ListContainers(listOpts)
+	if err != nil {
+		return err
+	}
+
+	for _, container := range list {
+		removeOpts := docker.RemoveContainerOptions{Force: true, ID: container.ID, RemoveVolumes: true}
+		err = d.Client.RemoveContainer(removeOpts)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
