@@ -120,7 +120,11 @@ func (d *Dokku) stop(appName string) error {
 	}
 
 	_, err = d.exec([]string{"cleanup"})
-	return err
+	if err != nil {
+		return err
+	}
+
+	return d.cleanupDeadContainers()
 }
 
 func (d *Dokku) restart(appName string) error {
@@ -155,4 +159,24 @@ func (d *Dokku) urls(appName string) ([]string, error) {
 		}
 	}
 	return result, nil
+}
+
+// cleanupDeadContainers removes any container with the "Dead" status returned by API.
+// Such containers are commonly left behind by 'dokku cleanup'
+func (d *Dokku) cleanupDeadContainers() error {
+	listOpts := docker.ListContainersOptions{All: true, Filters: map[string][]string{"status": {"dead"}}}
+	list, err := d.Client.ListContainers(listOpts)
+	if err != nil {
+		return err
+	}
+
+	for _, container := range list {
+		removeOpts := docker.RemoveContainerOptions{Force: true, ID: container.ID, RemoveVolumes: true}
+		err = d.Client.RemoveContainer(removeOpts)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
