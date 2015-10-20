@@ -1,4 +1,4 @@
-FROM scratch
+FROM experimentalplatform/ubuntu:latest
 
 COPY platform-app-manager /app-manager
 
