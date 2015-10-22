@@ -3,6 +3,7 @@ services:
   - docker
 install:
   - ./ci-build.sh
+  - docker build -t experimentalplatform/app-manager:$TRAVIS_BRANCH .
 script:
   - >
     if [ "${TRAVIS_BRANCH}" == "master" ]; then
