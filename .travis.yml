@@ -1,17 +1,9 @@
-language: go
-go: 1.5
 sudo: required
-env:
-  - GO15VENDOREXPERIMENT=1
 services:
   - docker
-before_install:
-  - ./install-glide-v1.sh
 install:
-  - glide up
+  - ./ci-build.sh
 script:
-  - go build -v
-  - docker build -t experimentalplatform/app-manager:$TRAVIS_BRANCH .
   - >
     if [ "${TRAVIS_BRANCH}" == "master" ]; then
       echo -e "\n\nWe're not uploading master anywhere."
