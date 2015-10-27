@@ -10,3 +10,5 @@ import:
     ref: 9987fc59f060a063247d22472c2fb48654bac5f6
   - package: github.com/fsouza/go-dockerclient
     ref: 09604abc82243886001c3f56fd709d4ba603cead
+  - package: github.com/Sirupsen/logrus
+    ref: v0.8.7
