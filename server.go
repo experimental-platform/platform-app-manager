@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/martini-contrib/binding"
 	"github.com/codegangsta/martini-contrib/render"
 	"github.com/go-martini/martini"
@@ -19,11 +20,14 @@ func main() {
 	flag.Parse()
 	fmt.Println("Port: ", port)
 
+	// disable timestamps, since we're using journald
+	log.SetFormatter(&log.TextFormatter{DisableTimestamp: true})
+
 	var err error
 	client, err = NewDokku()
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	m := martini.Classic()
@@ -33,6 +37,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, apps)
 		} else {
+			log.Errorf("/list: %v", err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -42,6 +47,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
+			log.Errorf("/start '%v': %v", d.Name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -51,6 +57,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
+			log.Errorf("/stop '%v': %v", d.Name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -60,6 +67,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
+			log.Errorf("/restart '%v': %v", d.Name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -69,6 +77,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
+			log.Errorf("/rebuild '%v': %v", d.Name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -78,6 +87,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
+			log.Errorf("/destroy '%v': %v", d.Name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -88,6 +98,7 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, urls)
 		} else {
+			log.Errorf("/urls/%v: %v", name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
@@ -102,6 +113,7 @@ func main() {
 				str,
 			})
 		} else {
+			log.Errorf("/logs/%v: %v", name, err.Error())
 			r.JSON(http.StatusInternalServerError, err.Error())
 		}
 	})
