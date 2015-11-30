@@ -9,6 +9,7 @@ import (
 	"github.com/go-martini/martini"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var client *Dokku
@@ -87,8 +88,14 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
-			log.Errorf("/destroy '%v': %v", d.Name, err.Error())
-			r.JSON(http.StatusInternalServerError, err.Error())
+			// ignore OverlayFS error
+			overlayErrorString := "Driver overlay failed to remove root filesystem"
+			if strings.Contains(err.Error(), overlayErrorString) {
+				r.JSON(http.StatusOK, d)
+			} else {
+				log.Errorf("/destroy '%v': %v", d.Name, err.Error())
+				r.JSON(http.StatusInternalServerError, err.Error())
+			}
 		}
 	})
 
