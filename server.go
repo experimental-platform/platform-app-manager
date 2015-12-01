@@ -88,9 +88,10 @@ func main() {
 		if err == nil {
 			r.JSON(http.StatusOK, d)
 		} else {
-			// ignore OverlayFS error
+			// ignore OverlayFS error and 'no such id' error
 			overlayErrorString := "Driver overlay failed to remove root filesystem"
-			if strings.Contains(err.Error(), overlayErrorString) {
+			noSuchIDErrorString := "Error response from daemon: no such id:"
+			if strings.Contains(err.Error(), overlayErrorString) || strings.Contains(err.Error(), noSuchIDErrorString) {
 				r.JSON(http.StatusOK, d)
 			} else {
 				log.Errorf("/destroy '%v': %v", d.Name, err.Error())
