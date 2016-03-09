@@ -10,12 +10,13 @@ This is a component of the experimental platform. To read more about it please g
 
 ## Branch: Development
 
-[![Circle CI](https://circleci.com/gh/experimental-platform/platform-app-manager.svg?style=svg&circle-token=a8d5defabf651d968fa1ebd1da9bf671e4438999)](https://circleci.com/gh/experimental-platform/platform-app-manager)
+[![Build Status](https://travis-ci.org/experimental-platform/platform-app-manager.svg?branch=development)](https://travis-ci.org/experimental-platform/platform-app-manager)
 
 All development branches stem from and (re-)integrate here.
 
 ## Branch: Master
 
-[![Circle CI](https://circleci.com/gh/experimental-platform/platform-app-manager/tree/master.svg?style=svg&circle-token=a8d5defabf651d968fa1ebd1da9bf671e4438999)](https://circleci.com/gh/experimental-platform/platform-app-manager/tree/master)
+[![Build Status](https://travis-ci.org/experimental-platform/platform-app-manager.svg?branch=master)](https://travis-ci.org/experimental-platform/platform-app-manager)
 
 This is the base for &alpha;-channel releases.
+
